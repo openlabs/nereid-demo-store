@@ -1,0 +1,67 @@
+{% macro render_product(product, classli=None, classimg="fimg") %}
+<li {% if classli %}class="{{ classli }}"{% endif %}>
+  {% if product.image_sets %}
+  <a href="{{ url_for('product.product.render', uri=product.uri) }}"><img src="{{ product.image_sets[0].medium_image.url }}" alt="{{ product.name }}" class="{{ classimg }}" height="133" width="195" title="{{ product.name }}"/></a>
+  {% else %}
+  <img src="{{ STATIC }}images/products/slide/img1.jpg" alt="{{ product.name }}" class="fimg" title="{{ product.name }}"/>
+  {% endif %}
+  <span class="smalltitle">
+    <a href="{{ url_for('product.product.render', uri=product.uri) }}">{{ product.name|truncate(18) }}</a>
+  </span>
+  <span class="smalldesc">{% trans %}Item no.:{% endtrans %}{{ product.code }}</span>
+
+  {% set sale_price = product.sale_price(product.id, 1) %}
+  {% if sale_price < product.list_price %}
+  <span class="onsale"><span class="oldprice">{{ product.list_price|currencyformat(request.nereid_currency.code) }}</span>{{ sale_price|currencyformat(request.nereid_currency.code) }}</span>
+  {% else %}
+  <span class="green ">{{ sale_price|currencyformat(request.nereid_currency.code) }}</span>
+  {% endif %}
+
+  {# TODO: create a facility to tag a product as new and hot #}
+  {% if False %}
+  <span class="itemhot">HOT</span>
+  {% elif False %}
+  <span class="itemnew">NEW</span>
+  {% endif %}
+</li>
+{% endmacro %}
+
+
+{% macro render_pagination(pagination, uri, endpoint) %}
+<div class="navigation">
+  {% if pagination.has_prev -%}
+  <a href="{{ url_for(endpoint, uri=uri, page=pagination.prev_num, **kwargs) }}" class="prevposts">previous</a>
+  {% endif %}
+  {%- for page in pagination.iter_pages(left_edge=0, left_current=5, right_current=5, right_edge=0) %}
+  <a 
+    href="{{ url_for(endpoint, uri=uri, page=page, **kwargs) }}" 
+    class="{% if page == pagination.page %}activeposts{% else %}inactiveposts{% endif %}">{{ page }}</a>
+  {%- endfor %}
+  {% if pagination.has_next -%}
+  <a href="{{ url_for(endpoint, uri=uri, page=pagination.next_num, **kwargs) }}" class="nextposts">nextposts</a>
+  {% endif %}
+</div>
+{% endmacro %}
+
+
+{% macro render_field(field, class_="") %}
+<div class="clearfix {% if field.errors %}error{% endif %}">
+  {% if field.label %}
+  <label for="{{ field.name }}">{{ field.label.text }}
+    {% if field.flags.required %}*{% endif %}:
+  </label>
+  {% endif %}
+  <div class="input">
+    {% if field.flags.required %}
+      {% set class_ = class_ + " required" %}
+    {% endif %}
+    {{ field(class_=class_, **kwargs) }}
+    {% if field.description %}
+    <br/><span class="help-inline">{{ field.description }}</span>
+    {% endif %}
+    {% for error in field.errors %}
+    <br/><span class="help-inline">{{ error|string }}</span>
+    {% endfor %}
+  </div>
+</div>
+{% endmacro %}

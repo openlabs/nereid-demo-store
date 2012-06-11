@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="{{ request.nereid_language.code }}">
+{% set STATIC = url_for('static', filename='').split('?')[0] %}
+{% from 'default/_helpers.jinja' import render_product with context %}
+<head>
+  <meta charset="utf-8" />
+  <title>{{ title }}</title>
+  
+  <link rel="shortcut icon" type="image/x-icon" href="{{ STATIC }}img/system/favicon.ico">
+
+  <!-- CSS -->
+  <link href='http://fonts.googleapis.com/css?family=Ubuntu:400,400italic,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="{{ STATIC }}css/reset.css" />
+  <link rel="stylesheet" href="{{ STATIC }}css/text.css" />
+  <link rel="stylesheet" href="{{ STATIC }}css/960.css" />
+  <link rel="stylesheet" href="{{ STATIC }}style.css" />
+
+
+  <!-- To be made locallinks from hot links -->
+  <link rel="stylesheet" href="http://zacstewart.github.com/Meow/jquery.meow.css" type="text/css" media="screen" title="no title" charset="utf-8">
+  <!-- END CSS -->
+
+  <!-- Javascript -->
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="{{ STATIC }}js/jquery.carousel.js" type="text/javascript" charset="utf-8"></script>
+  <script src="{{ STATIC }}js/jquery.gmap-1.1.0-min.js" type="text/javascript"></script>
+  <script src="{{ STATIC }}js/jquery.rating.js" type="text/javascript" charset="utf-8"></script>
+  <script src="{{ STATIC }}js/jquery.anythingslider.js" type="text/javascript" charset="utf-8"></script>
+  <script src="{{ STATIC }}js/custom.js" type="text/javascript" charset="utf-8"></script>
+
+  <!-- To be made locallinks from hot links -->
+  <script src="http://zacstewart.github.com/Meow/jquery.meow.js" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
+  <!-- END Javascript -->
+
+  <!-- Message Flashing -->
+  <script>
+    $(document).ready(function() {
+      {% for category, message in get_flashed_messages(with_categories=True) %}
+      $.meow({
+        message: '{{ message }}',
+        icon: '{{ category or '' }}'
+      });
+      {% endfor %}
+    });
+  </script>
+  <!-- END message Flashing -->
+
+  <!-- Submodules  -->
+  {% block extra_head %}
+  {% endblock %}
+  <!-- END Submodules  -->
+
+  {% if ga_account %}
+  <!-- Google Analytics -->
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', '{{ ga_account }}']);
+    _gaq.push(['_setDomainName', '{{ domain }}']);
+    _gaq.push(['_setAllowLinker', true]);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+
+  </script>
+  <!-- END Google Analytics -->
+  {% endif %}
+
+</head>
+<body>
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=120990628038904";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+<div id="meows"/>
+
+<div class="header">
+  <div class="container_16">
+    <div class="grid_5 logo">
+      <a href="{{ url_for('nereid.website.home') }}">
+        <img src="{{ STATIC }}images/logo.png" alt="logo" />
+      </a>
+    </div>
+    <div class="grid_6">
+      <div class="deliver-margin"><img src="{{ STATIC }}images/icons/go.png"><span><a href="#" class="delivery">{% trans %}Free 2-Days Delivery or faster<br>
+        ON FIRST ORDER $25+{% endtrans %}</a></span> </div>
+    </div>
+    <div class="grid_5"> <a href="#" class="search">&nbsp;</a>
+      <div class="searchtoggle">
+        <form>
+          <input type="text" id="s" onBlur="if(this.value=='')this.value='Type keyword and hit enter';" onFocus="if(this.value=='Type keyword and hit enter')this.value='';" value="Type keyword and hit enter" />
+        </form>
+      </div>
+      {% if request.is_guest_user %}
+      <a href="#" class="loginregister">&nbsp;</a>
+      {% else %}
+      <div class="user-box">
+        {% if request.nereid_user.facebook_id %}
+        <img src="https://graph.facebook.com/{{ request.nereid_user.facebook_id }}/picture" class="corner">
+        {% else %}
+        <img src="{{ STATIC }}images/user-img.gif" class="corner">
+        {% endif %}
+      </div>
+	    <div class="user-name-box">
+	  	  <div>{{ request.nereid_user.name }}</div>
+  	  	<div><a href="{{ url_for('nereid.website.logout') }}">{% trans %}Logout{% endtrans %}</a></div>
+	    </div>     
+      {% endif %}
+
+      <div class="logreg">
+        <div class="log1">
+          <div>
+            <a  class="fb_button fb_button_large" 
+                href="{{ url_for('nereid.user.facebook_login') }}">
+              <span class="fb_button_text">{% trans %}Login using Facebook{% endtrans %}</span>
+            </a><br> 
+          </div>
+
+          <div class="shiztitle">
+            <h2 class="title">{% trans %}or{% endtrans %}</h2>
+          </div>
+          <form class="minilogin" method="post" action="{{ url_for('nereid.website.login') }}">
+            <input type="text" class="miniusername half" id="miniusername" name="username" value="Username" onFocus="if(this.value=='Username')this.value='';" onBlur="if(this.value=='')this.value='Username';"/>
+            <input type="password" class="minipass half" id="minipass" name="password" value="Password" onFocus="if(this.value=='Password')this.value='';" onBlur="if(this.value=='')this.value='Password';" />
+            <input type="submit" class="mailsubmit" value="Sign In" />
+            <a href="{{ url_for('nereid.user.reset_account') }}" class="forgotpass">{% trans %}Forgot password?{% endtrans %}</a>
+          </form>
+        </div>
+        <div class="log2">
+          <div class="shiztitle">
+            <h2 class="title">{% trans %}Register{% endtrans %}</h2>
+          </div>
+          <div class="reginfo"> {% trans %}New User? By creating an account you 
+            be able to shop faster, be up to date on 
+            an order's status...{% endtrans %} </div>
+          <a href="{{ url_for('nereid.user.registration') }}" class="regnow">{% trans %}Register Now{% endtrans %}</a> </div>
+      </div>
+    </div>
+    <div class="grid_16 menu">
+      <ul class="menu1">
+        <li>
+          <a href="{{ url_for('nereid.website.home') }}" class="active">
+            {% trans %}Home{% endtrans %}<span>&nbsp;</span>
+          </a>
+        </li>
+        {% for browse_node in request.nereid_website.browse_nodes %}
+        <li>
+          <a href="{{ url_for('product.browse_node.render', uri=browse_node.uri) }}">{{ browse_node.name }}</a>
+          {% if browse_node.children %}
+          <div class="megamenu">
+            <ul class="sub-menu">
+              {% for child in browse_node.children if child.displayed_on_eshop %}
+              <li><a href="{{ url_for('product.browse_node.render', uri=child.uri) }}" title="{{ child.name }}">{{ child.name|truncate(25) }}</a></li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+
+      <!-- Cart -->
+      {% set user_cart = get_cart() %}
+      <div class="wrapcart">
+        {% if user_cart.sale %}
+        <a href="#" class="cartstatus">{{ user_cart.sale.total_amount }}</a>
+        <div class="cartdrop">
+          <ul>
+            {% for line in user_cart.sale.lines %}
+            <li>
+              <a href="{{ url_for('product.product.render', uri=line.product.uri) }}">
+                {% for imageset in line.product.image_sets if imageset.thumbnail_image %}
+                <img src="{{ imageset.thumbnail_image.url }}" alt="" class="itemsmall" height="44" width="46">
+                
+                {% else %}
+                <img src="{{ STATIC }}images/incart.png" class="inp" alt="{{ line.product.name }}" />
+                {% endfor %}
+              </a> 
+              <span class="ininfo">
+                <span class="intitle">
+                  <a href="{{ url_for('product.product.render', uri=line.product.uri) }}">
+                  {{ line.product.name }}
+                  </a>
+                </span> 
+                <span class="inquantity">x {{ line.quantity|int }}</span> 
+                <span class="inprice">{{ line.amount|currencyformat(line.sale.currency.code) }}</span> 
+                <span class="inremove">
+                  <a href="{{ url_for('nereid.cart.delete_from_cart', line=line.id) }}">
+                    <img src="{{ STATIC }}images/remove.png" alt="remove" />
+                  </a>
+                </span> 
+              </span>
+            </li>
+            {% endfor %}
+            <li class="pricedet">
+              <span class="pricesub"> 
+                {% trans %}Sub-Total{% endtrans %} : <span class="darker">{{ user_cart.sale.untaxed_amount|currencyformat(user_cart.sale.currency.code) }}</span> |  {% trans %}Tax{% endtrans %} : <span class="darker">{{ user_cart.sale.tax_amount|currencyformat(user_cart.sale.currency.code) }} </span> 
+              </span> 
+              <a href="{{ url_for('nereid.cart.view_cart') }}" class="mailsubmit">{% trans %}More{% endtrans %}</a> 
+              <a href="{{ url_for('nereid.checkout.default.checkout') }}" class="mailsubmit">{% trans %}Checkout{% endtrans %}</a> 
+              <span class="whiteprice">
+                <span class="totalno">{% trans %}Total{% endtrans %}</span> 
+                <span class="final">{{ user_cart.sale.total_amount|currencyformat(user_cart.sale.currency.code) }}</span>
+              </span> 
+            </li>
+          </ul>
+        </div>
+        {% else %}
+        <a href="#" class="cartstatus">{{ 0|currencyformat(request.nereid_currency.code) }}</a>
+        {% endif %}
+      </div>
+      <!-- END cart -->
+
+    </div>
+    <div class="grid_16 main">
+      <div class="smallmenu">
+        <ul>
+          <li><a href="{{ url_for('nereid.website.account') }}" class="myacc">{% trans %}My Account{% endtrans %}</a></li>
+          <li><a href="{{ url_for('nereid.cart.view_cart') }}" class="myshop">{% trans %}Shopping Cart{% endtrans %}</a></li>
+          <li><a href="{{ url_for('nereid.checkout.default.checkout') }}" class="mycheck">{% trans %}Checkout{% endtrans %}</a></li>
+        </ul>
+      </div>
+      <div class="lines"></div>
+    </div>
+  </div>
+</div>
+<!--end header -->
+{% block main %}
+{% endblock %}
+
+{% block belowmain %}
+<div class="clear"></div>
+<div class="featuredproducts">
+  <div class="container_16">
+    <div class="grid_16">
+      <h2 class="title">Featured Products</h2>
+      <img src="{{ STATIC }}images/shizzle.png" alt="shizzle" class="shizzle" />
+      <div class="controls"> <a href="javascript:;" class="cprev"><span class="slide-icon-left"></span></a> <a href="javascript:;" class="cnext"><span class="slide-icon-right"></span></a> </div>
+      <div class="clear"></div>
+      <ul class="featprod carousels">
+        {% if request.nereid_website.featured_products_node %}
+        {% for product in request.nereid_website.featured_products_node.products %}
+        {{ render_product(product) }}
+        {% endfor %}
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="withside">
+  <div class="container_16 main2">
+    <div class="grid_11 lefthome">
+      <h2 class="title">{% trans %}About this store{% endtrans %}</h2>
+      <div class="shizzley"></div>
+      <div class="about">{% trans %}This is a demo shop
+      <br/>
+      The information of this site was generated using ICEcat
+      <br/>
+      If you place orders on this website, we will neither take your money nor ship anything to you :P
+      {% endtrans %}</div>
+      <div class="clear"></div>
+      <div class="shizzley"></div>
+      <div class="clear"></div>
+      <ul class="featprod grayprod homelist">
+        {% for product in [] %}
+        {{ render_product(product) }}
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="grid_4 righthome">
+      <h2 class="title">{% trans %}Categories{% endtrans %}</h2>
+      <div class="shizzley shizzley3"></div>
+      <div class="categorybox">
+        <ul>
+          {% for browse_node in request.nereid_website.browse_nodes %}
+          <li {% if loop.last %}class="lastone"{% endif %}>
+            <a href="{{ url_for('product.browse_node.render', uri=browse_node.uri) }}">{{ browse_node.name|truncate(25) }}</a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div>&nbsp;</div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block subfooter %}
+<div class="subfooter">
+  <div class="container_16">
+    <div class="boxwrap">
+      <div class="footerbox twitter">
+        <h2 class="title">{% trans %}Twitter Updates{% endtrans %}</h2>
+        <div class="shizzle4"></div>
+        <ul class="tweets">
+          <li><script src="http://widgets.twimg.com/j/2/widget.js"></script>
+				<script>
+				new TWTR.Widget({
+				  version: 2,
+				  type: 'profile',
+				  rpp: 5,
+				  interval: 2000,
+				  subject: "What's buzzing at Openlabs...",
+				  title: "Openlabs",
+				  width: 293,
+				  height: 130,
+				  theme: {
+					shell: {
+					  background: '#3d3d3d',
+					  color: '#ffffff'
+					},
+					tweets: {
+					  background: '#ffffff',
+					  color: '#444',
+					  links: '#00b4ff'
+					}
+				  },
+				  features: {
+					scrollbar: false,
+					loop: true,
+					live: true,
+					hashtags: true,
+					timestamp: true,
+					avatars: true,
+					behavior: 'default'
+				  }
+				}).render().setUser('openlabsindia').start();
+				</script></li>
+        </ul>
+       </div>
+      <div class="footerbox">
+        <h2 class="title">{% trans %}Newsletter Signup{% endtrans %}</h2>
+        <div class="shizzle4 mid"></div>
+        <div class="newsletter">{% trans %}Become the first one to know about every new
+          product we release on every day. Sign Up for
+          the newsletter to get discouns too..{% endtrans %}
+          <form class="signup" action="#" method="GET">
+            <label for="emailba">{% trans %}Your email address{% endtrans %}</label>
+            <input type="text" value="your@email.com" class="mailinput" id="mailinput" name="mailinput" />
+            <input type="submit" class="mailsubmit" value="Sign Up" id="signup" name="signup" />
+          </form>
+        </div>
+      </div>
+      <div class="footerboxlast"> <img src="{{ STATIC }}images/minilogo.png" class="minilogo" alt="logo" />
+        <div class="shizzle4 slast"></div>
+        <div class="clear"></div>
+        <ul class="infos">
+          <li class="fphone">Openlabs Technologies &amp; Consulting (P) Limited<br>
+            JSSATE-STEP Park, C-20/1, Sector - 62, Noida - 201301, NCR of Delhi, India</li>
+          <li class="fmobile"><br>
+            +91 0120 645 5161<br>
+            +1 813 - 793 - OPEN</li>
+          <li class="fmail lastone"><br>
+            sales@openlabs.co.in</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<div class="footer">
+  <div class="container_16">
+    <div class="grid_13">
+      <ul class="footermenu">
+        <li><a href="{{ url_for('nereid.website.home') }}">{% trans %}Home{% endtrans %}</a></li>
+        <li><a href="{{ url_for('nereid.cart.view_cart') }}">{% trans %}My Cart{% endtrans %}</a></li>
+        <li><a href="{{ url_for('nereid.checkout.default.checkout') }}">{% trans %}Checkout{% endtrans %}</a></li>
+        <li><a href="{{ url_for('sale.sale.render_list') }}">{% trans %}Completed Orders{% endtrans %}</a></li>
+      </ul>
+      <span class="copyline">© 2012 Openlabs Technologies &amp; Consulting (P) Limited&nbsp;&nbsp;-&nbsp; <a href="http://openlabs.co.in/" target="_blank">openlabs.co.in</a></span>
+      <div class="cards"><img src="{{ STATIC }}images/cards.png" alt="credit cards" /></div>
+    </div>
+    <div class="grid_3"> <span class="followon">Follow us on</span>
+      <div class="socializer"> 
+        <a href="mailto: info@openlabs.co.in" class="social-email">E-mail</a> 
+        <a href="http://www.linkedin.com/company/openlabs_technologies_&amp;_consulting_ltd" class="social-linkedin" target="_blank">LinkedIn</a> 
+        <a href="http://twitter.com/#!/openlabsindia" class="social-twitter" target="_blank">Twitter</a> 
+        <a href="http://www.facebook.com/openlabs" class="social-facebook" target="_blank">Facebook</a> 
+        <a href="http://www.youtube.com/user/openlabsindia" class="social-youtube" target="_blank">youtube</a> 
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+<!-- end .container_16 -->
+<div class="demo">&nbsp;</div>
+</body>
+</html>

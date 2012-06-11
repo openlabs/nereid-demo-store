@@ -1,0 +1,191 @@
+{% extends 'default/base.jinja' %}
+
+{% set bread_crumbs = make_crumbs(product.browse_nodes[0], 'product.browse_node.render', field_map_changes={'title_field': 'name'}) %}
+
+{% block main %}
+<div class="container_16 padding50">
+  <div class="grid_16">
+    <div class="ribbonbig">
+      <div class="lijevo">
+        {% if product.browse_nodes %}
+        <div class="bread">
+        {% set bread_crumbs = make_crumbs(product.browse_nodes[0], 'product.browse_node.render', field_map_changes={'title_field': 'name'}) %}
+          {% for crumb in bread_crumbs %}
+          {% if not loop.last %}
+          <a href="{{ crumb[0] }}">{{ crumb[1] }}</a>&nbsp;&nbsp;&gt;&nbsp;
+          {% else %}
+          {{ crumb[1] }}
+          {% endif %}
+          {% endfor %}
+        </div>
+        {% endif %}
+        <div class="bigtitle">{{ product.name }}</div>
+      </div>
+      <div class="desno">&nbsp;</div>
+    </div>
+  </div>
+  <div class="grid_11 singleleft">
+    <div class="shiztitle">
+      <h2 class="title h2bg">{{ product.name }}</h2>
+    </div>
+    <div class="clear"></div>
+    <div class="productimages">
+      <div class="mainimg">
+        {% if product.image_sets %}
+        <img src="{{ product.image_sets[0].large_image.url }}" alt="{{ product.name }}" width="332" height="251">
+        {% else %}
+        <img src="{{ STATIC }}images/mainimg.png" alt="nikon">
+        {% endif %}
+      </div>
+      {% set sale_price = product.sale_price(product.id, 1) %}
+      {% if sale_price < product.list_price %}
+      <span class="onsale"><span class="oldprice">{{ product.list_price|currencyformat(request.nereid_currency.code) }}</span>{{ sale_price|currencyformat(request.nereid_currency.code) }}</span>
+      {% else %}
+      <span class="onsale">{{ sale_price|currencyformat(request.nereid_currency.code) }}</span>
+      {% endif %}
+      {% for image_set in product.image_sets %}
+      <div class="psimages">
+        <a href="#">
+          <img src="{{ image_set.thumbnail_image.url }}" 
+            alt="{{ image_set.name }}" width="76" height="63">
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="productdata">
+      {#<div class="infospan">Model <span>PT - 3</span></div>#}
+      <div class="infospan">{% trans %}Item no{% endtrans %} <span>{{ product.code }}</span></div>
+      {#<div class="infospan">Manufacturer <span>Nikon</span></div>#}
+      <div>&nbsp;</div>
+      {% if 'variants' in product._model._columns and product.variants %}
+      <h4>Available Options</h4>
+      <div class="infospan">Memory
+        <select>
+          <option value="m1">1 GB</option>
+          <option value="m2">2 GB</option>
+          <option value="m3" selected="">4 GB</option>
+          <option value="m4">8 GB</option>
+        </select>
+      </div>
+      <div class="infospan">Color
+        <select>
+          <option value="m1">Red</option>
+          <option value="m2">Blue</option>
+          <option value="m3" selected="">White</option>
+          <option value="m4">Black</option>
+        </select>
+      </div>
+      {% endif %}
+      <div class="quantity"> 
+        <form method="post" action="{{ url_for('nereid.cart.add_to_cart') }}">
+          <span>{% trans %}Qty.{% endtrans %}:</span>
+          <input type="text" class="quantityinput" id="quantityinput" name="quantity" value="1">
+          <input type="hidden" id="product" name="product" value="{{ product.id }}">
+          <input type="hidden" id="action" name="action" value="add">
+          {% if product.get_availability(product.id)['quantity'] %}
+          <input type="submit" class="addtocart" id="addtocart" name="addtocart" value="Add to Cart">
+          {% endif %}
+        </form>
+      </div>
+      <div class="sharing">
+        <div class="addthis_toolbox addthis_default_style "> <a class="addthis_counter addthis_pill_style"></a> <div class="atclear"></div></div>
+        <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=xa-4f0d0827271d1c3b"></script>
+        {% if product.get_availability(product.id)['quantity'] %}
+        <span class="instock">{% trans %}In stock{% endtrans %}</span></div>
+        {% else %}
+        <span class="nostock">{% trans %}Out of stock{% endtrans %}</span></div>
+        {% endif %}
+
+    </div>
+    <div class="tabs">
+      <!-- tabs -->
+      <ul class="tabNavigation">
+        <li class="ewizz"><a href="#desc">{% trans %}Description{% endtrans %}</a></li>
+        <li><a href="#reviews">Reviews (1)</a></li>
+      </ul>
+      <!-- tab containers -->
+      <div id="desc" style="display: block; ">
+        <p>{{ product.description|replace('\n', '')|safe }}</p>
+      </div>
+      <div id="reviews" style="display: none; "> <span class="user">John Doe</span> (11/25/2012)
+        <div class="reviewtext">Vestibulum molestie tellus rhoncus nulla cursus quis dictum orci laoreet! metus. Vestibulum molestie
+          tellus rhoncus nulla cursus quis dictum orci laoreet! metus.</div>
+        <div class="write">
+          <h4>Write review</h4>
+          <form class="review">
+            <input type="text" value="Your Name" id="reviewname" name="reviewname">
+            <textarea class="reviewarea" id="reviewarea" name="reviewarea">Your review</textarea>            
+            <div class="submit-btn">Submit</div>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% if product.cross_sells %}
+    <div class="shiztitle">
+      <h2 class="title h2bg">{% trans %}Customers Who Bought This Item Also Bought{% endtrans %}</h2>
+    </div>
+    <ul class="featprod grayprod">
+      {% for row in product.cross_sells|batch(3) %}
+        {% for rel in row %}
+          {% if loop.last %}
+          {{ render_product(rel, classli="classli", classimg="fimg2") }}
+          {% else %}
+          {{ render_product(rel, classimg="fimg2") }}
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% if product.up_sells %}
+    <div class="shiztitle">
+      <h2 class="title h2bg">{% trans %}Related Products{% endtrans %}</h2>
+    </div>
+    <ul class="featprod grayprod">
+      {% for row in product.up_sells %}
+      {% for rel in row %}
+          {% if loop.last %}
+          {{ render_product(rel, classli="classli", classimg="fimg2") }}
+          {% else %}
+          {{ render_product(rel, classimg="fimg2") }}
+          {% endif %}
+      {% endfor %}
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+  </div>
+  <div class="grid_4 righthome">
+    <h2 class="title">{% trans %}Categories{% endtrans %}</h2>
+    <div class="shizzley shizzley3"></div>
+    <div class="categorybox">
+      <ul>
+        {% for browse_node in request.nereid_website.browse_nodes %}
+        <li>
+          <a {% if loop.last %}class="lastone"{% endif %}href="{{ url_for('product.browse_node.render', uri=browse_node.uri) }}">
+          {{ browse_node.name }} 
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div>&nbsp;</div>
+    <div class="categories-widget">
+      <div class="shiztitle">
+        <h2 class="title h2bg">{% trans %}Best sellers{% endtrans %}</h2>
+      </div>
+      <div class="categorybox sellers">
+        <ul>
+          <li><a href="#"><img class="smallpreview" alt="" src="{{ STATIC }}images/smallcam.png"></a> <a class="smalltitle2" href="#">Panasonic M3</a> <span class="smallprice2">Price : $122</span> </li>
+          <li><a href="#"><img class="smallpreview" alt="" src="{{ STATIC }}images/smallcam.png"></a> <a class="smalltitle2" href="#">Panasonic M3</a> <span class="smallprice2">Price : $122</span> </li>
+          <li><a href="#"><img class="smallpreview" alt="" src="{{ STATIC }}images/smallcam.png"></a> <a class="smalltitle2" href="#">Panasonic M3</a> <span class="smallprice2">Price : $122</span> </li>
+          <li clas="lastone"><a href="#"><img class="smallpreview" alt="" src="{{ STATIC }}images/smallcam.png"></a> <a class="smalltitle2" href="#">Panasonic M3</a> <span class="smallprice2">Price : $122</span> </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+{% block belowmain %}
+{% endblock %}

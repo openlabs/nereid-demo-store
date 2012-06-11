@@ -1,0 +1,15 @@
+.half {
+height:auto;
+padding-top: 10px; 
+padding-bottom: 10px; 
+padding-left: 10px;
+width:201px;}
+.full {
+height:auto;
+padding-top: 10px; 
+padding-bottom: 10px; 
+padding-left: 10px;
+width:424px;}
+#quicksubmit {
+width:88px!important;
+height:28px!important;}

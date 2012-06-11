@@ -1,0 +1,73 @@
+{% extends 'default/base.jinja' %}
+
+{% from 'default/_helpers.jinja' import render_field with context %}
+
+{% block extra_head %}
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(function(){
+
+  // Use client side validation on the form
+  $("form#registration").validate({
+    errorElement: "span",
+    wrapper: "",
+    errorPlacement: function(error, element) {
+      error.insertAfter(element);
+      console.log(error);
+      console.log(element);
+      element.parents("div.clearfix").addClass("error");
+    },
+    submitHandler: function(form) {
+      clicky.goal('Registration Submitted');
+      clicky.pause(500);
+      $("form#registration button.cont").button('loading');
+      form.submit();
+    }
+  });
+  $("form#registration input[name='confirm']").rules("add", {
+    equalTo: "#password"
+  });
+});
+</script>
+{% endblock %}
+
+{% block main %}
+<div class="container_16 padding50">
+  <div class="grid_16">
+    <div class="ribbonbig">
+      <div class="lijevo">
+        <div class="bread">
+          <a href="{{ url_for('nereid.website.home') }}">
+            {% trans %}Home{% endtrans %}
+          </a>&nbsp;&nbsp;&gt;&nbsp;{% trans %}Registration{% endtrans %}</div>
+        <div class="bigtitle">{% trans %}Registration{% endtrans %}</div>
+      </div>
+      <div class="desno">&nbsp;</div>
+    </div>
+  </div>
+</div>
+<div class="withside">
+  <div class="container_16 main2 padding50">
+    <div class="grid_16">
+      <div class="shiztitle">
+        <h2 class="title h2bg">{% trans %}Register using Facebook{% endtrans %}</h2>
+      </div>
+      <a  class="fb_button fb_button_large" 
+        href="{{ url_for('nereid.user.facebook_login') }}">
+        <span class="fb_button_text">{% trans %}Login using Facebook{% endtrans %}</span>
+      </a> 
+      <div class="shiztitle">
+        <h2 class="title h2bg">{% trans %}or{% endtrans %}</h2>
+      </div>
+      <form id="registration" class="classic" method="post" action="{{ url_for('nereid.user.registration') }}">
+        	{{ render_field(form.name, placeholder=_("Full Name"), class_="full") }}
+		      {{ render_field(form.email, class_="full email", placeholder=_("Email")) }}
+		      {{ render_field(form.password, class_="half") }}
+		      {{ render_field(form.confirm, class_="half") }}
+          <input type="submit" class="mailsubmit" value="Submit">
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block belowmain %}{% endblock %}

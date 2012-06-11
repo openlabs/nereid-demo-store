@@ -1,0 +1,105 @@
+{% extends 'default/base.jinja' %}
+
+{% block main %}
+<div class="container_16 padding50">
+  <div class="grid_16">
+    <div class="ribbonbig">
+      <div class="lijevo">
+        <div class="bread">
+          <a href="#">Home</a>
+          &nbsp;&nbsp;&gt;&nbsp;
+          <a href="{{ url_for('sale.sale.render_list') }}">Orders</a>
+          &nbsp;&nbsp;&gt;&nbsp;
+          Order #: {{ sale.reference }}
+        </div>
+        <div class="bigtitle">{% trans %}Order #:{% endtrans %} {{ sale.reference }}</div>
+      </div>
+      <div class="desno">&nbsp;</div>
+    </div>
+  </div>
+
+  <div class="grid_16">
+    <div class="padding25">
+      <div class="billing">
+        <div class="shiztitle">
+          <h2 class="title h2bg">{% trans %}Order Details{% endtrans %}</h2>
+        </div>
+        Order date: {{ sale.sale_date|dateformat }}<br>
+        Order Number: {{ sale.reference }}
+      </div>
+    </div>
+  </div>
+
+  <div class="grid_8">
+    <div class="padding25">
+      <div class="billing">
+        <div class="shiztitle">
+          <h2 class="title h2bg">{% trans %}Billing Address{% endtrans %}</h2>
+        </div>
+        {{ sale.invoice_address.rec_name }}<br>
+        {{ sale.invoice_address.subdivision.name }}, {{ sale.invoice_address.country.name }}
+      </div>
+    </div>
+  </div>
+
+  <div class="grid_8">
+    <div class="padding25">
+      <div class="billing">
+        <div class="shiztitle">
+          <h2 class="title h2bg">{% trans %}Shipping Address{% endtrans %}</h2>
+        </div>
+        {{ sale.shipment_address.rec_name }}<br>
+        {{ sale.shipment_address.subdivision.name }}, {{ sale.shipment_address.country.name }}
+      </div>
+    </div>
+  </div>
+
+  <div class="grid_16">
+    <div class="padding25">
+      <div class="shiztitle">
+        <h2 class="title h2bg">Payment Method</h2>
+      </div>
+      <div class="method">
+        <h3>{{ sale.payment_method.name }}</h3>
+      </div>
+    </div>
+  </div>
+  <div class="grid_16">
+    <div class="padding25">
+      <div class="shiztitle">
+        <h2 class="title h2bg">Order Details</h2>
+      </div>
+      <div class="content">
+        <table cellpadding="3" cellspacing="3">
+          <tbody><tr class="blacky">
+            <td class="table210">Name</td>
+            <td class="table100">Item No.</td>
+            <td class="table100">Quantity</td>
+            <td class="table95">Unit Price</td>
+            <td class="table100">Total Price</td>
+          </tr>
+          {% for line in sale.lines %}
+          <tr>
+            <td>{{ line.product.name }}</td>
+            <td>{{ line.product.code }}</td>
+            <td>{{ line.quantity|int }} {{ line.unit.name }}</td>
+            <td>{{ line.unit_price|currencyformat(line.sale.currency.code) }}</td>
+            <td>{{ line.amount|currencyformat(line.sale.currency.code) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody></table>
+      </div>
+    </div>
+  </div>
+  <div class="grid_7 notempty"></div>
+  <div class="grid_9"> 
+    <span class="subtotal">Sub Total:&nbsp;&nbsp;&nbsp;{{ sale.untaxed_amount|currencyformat(sale.currency.code) }}</span> 
+    <span class="subtotal">Tax :&nbsp;&nbsp;&nbsp;&nbsp;{{ sale.tax_amount|currencyformat(sale.currency.code) }}</span>
+    <div class="total">Total : <span class="bigprice">{{ sale.total_amount|currencyformat(sale.currency.code) }}</span></div>
+    <div class="updaters">
+    </div>
+  </div>
+  </form>
+</div>
+{% endblock %}
+

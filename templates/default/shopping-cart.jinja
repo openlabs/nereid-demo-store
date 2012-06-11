@@ -1,0 +1,107 @@
+{% extends 'default/base.jinja' %}
+
+{% block extra_head %}
+<script>
+  $(document).ready(function() {
+        $("input.quantity").change(function() {
+        var qty_element = $(this);
+        var product_element = $(this).siblings("input.product");
+        var new_quantity = parseInt(qty_element.val());
+        if (isNaN(new_quantity)) {
+          new_quantity = 1;
+        }
+        $.post('{{ url_for('nereid.cart.add_to_cart')  }}',
+          {'quantity': new_quantity, 'product': product_element.val()},
+          function(data){
+            window.location.href=window.location.href;
+          }
+        );
+    });
+  });
+</script>
+{% endblock %}
+
+{% block main %}
+<div class="container_16 padding50">
+  <div class="grid_16">
+    <div class="ribbonbig">
+      <div class="lijevo">
+        <div class="bread">
+          <a href="{{ url_for('nereid.website.home') }}">Home</a>&nbsp;&nbsp;›&nbsp;{% trans %}Shopping Cart{% endtrans %}</div>
+        <div class="bigtitle">{% trans %}Shopping Cart{% endtrans %}</div>
+      </div>
+      <div class="desno">&nbsp;</div>
+    </div>
+    <div class="content">
+      {% if cart.sale and cart.sale.lines %}
+      <div class="shiztitle">
+        <h2 class="title h2bg">{% trans %}Shopping Cart{% endtrans %}</h2>
+      </div>
+      <table cellpadding="3" cellspacing="3">
+        <tbody><tr class="blacky">
+          <td class="table100">{% trans %}Image{% endtrans %}</td>
+          <td >{% trans %}Name{% endtrans %}</td>
+          <td class="table95">{% trans %}Item no.{% endtrans %}</td>
+          <td class="table100">{% trans %}Quantity{% endtrans %}</td>
+          <td class="table100">{% trans %}Unit Price{% endtrans %}</td>
+          <td class="table95">{% trans %}Total{% endtrans %}</td>
+          <td class="table80">{% trans %}Remove{% endtrans %}</td>
+        </tr>
+        {% for line in cart.sale.lines %}
+        <tr>
+          <td>
+            <a href="{{ url_for('product.product.render', uri=line.product.uri) }}">
+            {% for imageset in line.product.image_sets if imageset.thumbnail_image %}
+            <img src="{{ imageset.thumbnail_image.url }}" alt="" class="itemsmall">
+            {% else %}
+            <img src="{{ STATIC }}images/camera.png" alt="" class="itemsmall">
+            {% endfor %}
+          </td>
+          <td>{{ line.product.name }}</td>
+          <td>{{ line.product.code }}</td>
+          <td>
+            <input type="text" class="itemcount quantity" value="{{ line.quantity|int }}" 
+              id="quantity" name="itemcount">
+            <input type="hidden" class="product" name="product" value="{{ line.product.id }}"/>
+          </td>
+          <td>{{ line.product.sale_price(line.product.id, line.quantity)|currencyformat(line.sale.currency.code) }}</td>
+          <td>{{ line.amount|currencyformat(line.sale.currency.code) }}</td>
+          <td>
+            <span class="inremove">
+              <a href="{{ url_for('nereid.cart.delete_from_cart', line=line.id) }}">
+                <img src="{{ STATIC }}images/remove.png" alt="remove" />
+              </a>
+            </span> 
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody></table>
+      {% else %}
+      <h3>{% trans %}Hey! you haven't added anything to your cart yet{% endtrans %}</h3>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if cart.sale and cart.sale.lines %}
+  <div class="grid_7 coupons">
+    <label for="couponcode">Coupon code</label>
+    <input type="text" value="" id="couponcode" name="couponcode">
+    <input type="submit" value="Apply" id="submitcoupon" class="sub" name="submitcoupon">
+    <div class="clear"></div>
+    <div class="separate"></div>
+    <label for="couponcode">Coupon code</label>
+    <input type="text" value="" id="couponcode" name="couponcode">
+    <input type="submit" value="Apply" id="submitcoupon" class="sub" name="submitcoupon">
+  </div>
+  <div class="grid_9">
+    <span class="subtotal">Sub Total:&nbsp;&nbsp;&nbsp;{{ cart.sale.untaxed_amount|currencyformat(cart.sale.currency.code) }}</span> 
+    <span class="subtotal">Tax :&nbsp;&nbsp;&nbsp;&nbsp;{{ cart.sale.tax_amount|currencyformat(cart.sale.currency.code) }}</span>
+    <div class="total">Total : <span class="bigprice">{{ cart.sale.total_amount|currencyformat(cart.sale.currency.code) }}</span></div>
+    <div class="updaters">
+    </div>
+    <a href="{{ url_for('nereid.checkout.default.checkout') }}" class="yellow">{% trans %}Checkout ≫{% endtrans %}</a><br/>
+    <a href="{{ url_for('nereid.website.home') }}" class="yellow">{% trans %}Continue Shopping{% endtrans %}</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

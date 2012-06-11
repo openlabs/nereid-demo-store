@@ -1,0 +1,49 @@
+{% extends 'default/base.jinja' %}
+
+{% from 'default/_helpers.jinja' import render_field with context %}
+
+
+{% block main %}
+<div class="container_16 padding50">
+  <div class="grid_16">
+    <div class="ribbonbig">
+      <div class="lijevo">
+        <div class="bread">
+          <a href="{{ url_for('nereid.website.home') }}">
+            {% trans %}Home{% endtrans %}
+          </a>&nbsp;&nbsp;&gt;&nbsp;{% trans %}Login{% endtrans %}</div>
+        <div class="bigtitle">{% trans %}Login{% endtrans %}</div>
+      </div>
+      <div class="desno">&nbsp;</div>
+    </div>
+  </div>
+</div>
+<div class="withside">
+  <div class="container_16 main2 padding50">
+    <div class="grid_16">
+      {% if not request.is_guest_user %}
+      <h2>{% trans %}Hey{% endtrans %} {{ request.nereid_user.name }}, {% trans %}you are already logged in{% endtrans %}</h2>
+      <span><em>Not <a href="{{ url_for('nereid.website.logout') }}">{{ request.nereid_user.name }}</a> ?</em></span>
+      {% else %}
+      <div>
+        <a  class="fb_button fb_button_large" 
+            href="{{ url_for('nereid.user.facebook_login') }}">
+          <span class="fb_button_text">{% trans %}Login using Facebook{% endtrans %}</span>
+        </a> 
+      </div>
+      <div class="shiztitle">
+        <h2 class="title h2bg">{% trans %}or{% endtrans %}</h2>
+      </div>
+      <form id="login" class="classic" method="post" action="{{ url_for('nereid.website.login') }}">
+		      {{ render_field(login_form.email, class_="full email", placeholder=_("Email")) }}
+		      {{ render_field(login_form.password, class_="half") }}
+          <input type="submit" class="mailsubmit" value="Submit">
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block belowmain %}{% endblock %}
+

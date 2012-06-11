@@ -1,0 +1,39 @@
+{% extends 'default/base.jinja' %}
+
+{% from 'default/_helpers.jinja' import render_product, render_pagination with context %}
+{% set bread_crumbs = make_crumbs(browse_node, 'product.browse_node.render', field_map_changes={'title_field': 'name'}) %}
+
+{% block main %}
+<div class="container_16 padding50">
+  <div class="grid_16">
+    <div class="ribbonbig">
+      <div class="lijevo">
+        <div class="bread">
+          {% for crumb in bread_crumbs %}
+          {% if not loop.last %}
+          <a href="{{ crumb[0] }}">{{ crumb[1] }}</a>&nbsp;&nbsp;&gt;&nbsp;
+          {% else %}
+          {{ crumb[1] }}
+          {% endif %}
+          {% endfor %}
+        </div>
+        <div class="bigtitle">{{ browse_node.name }}</div>
+      </div>
+      <div class="desno">&nbsp;</div>
+    </div>
+    <div class="content">
+      <div class="shiztitle">
+        <h2 class="title h2bg">{{ browse_node.name }} - {% trans %}All items{% endtrans %}</h2>
+      </div>
+      <ul class="featprod fullprod">
+        {% for product in products %}
+        {{ render_product(product) }}
+        {% endfor %}
+      </ul>
+      <div class="clear"></div>
+      {{ render_pagination(products, browse_node.uri, 'product.browse_node.render') }}
+    </div>
+  </div>
+</div>
+{% endblock %}
+

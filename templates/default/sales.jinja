@@ -1,0 +1,50 @@
+{% extends 'default/base.jinja' %}
+
+{% block main %}
+<div class="container_16 padding50">
+  <div class="grid_16">
+    <div class="ribbonbig">
+      <div class="lijevo">
+        <div class="bread"><a href="#">Home</a>&nbsp;&nbsp;›&nbsp;Orders</div>
+        <div class="bigtitle">Orders</div>
+      </div>
+      <div class="desno">&nbsp;</div>
+    </div>
+    <div class="content">
+      <div class="shiztitle">
+        <h2 class="title h2bg">Orders</h2>
+      </div>
+      <table cellpadding="3" cellspacing="3">
+        <tbody><tr class="blacky">
+          <td class="table80">Order Id</td>
+          <td class="table100">Date Added</td>
+          <td class="table210">Product</td>
+          <td class="table100">Model</td>
+          <td class="table95">Status</td>
+          <td class="table100">Price</td>
+          <td class="table100">Details</td>
+        </tr>
+        {% for sale in sales %}
+        <tr>
+          <td>{{ sale.reference }}</td>
+          <td>{{ sale.sale_date|dateformat }}</td>
+          <td>
+            {% for line in sale.lines %}
+            <span>{{ line.product.name }}</span><br>
+            {% endfor %}
+          </td>
+          <td>
+            {% for line in sale.lines %}
+            <span>{{ line.product.code }}</span><br>
+            {% endfor %}
+          </td>
+          <td>{{ sale.state|upper }}</td>
+          <td>{{ sale.total_amount|currencyformat(sale.currency.code) }}</td>
+          <td><a href="{{ url_for('sale.sale.render', sale=sale.id) }}" class="eye">View Details</a></td>
+        </tr>
+        {% endfor %}
+      </tbody></table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,266 @@
+{% extends 'default/base.jinja' %}
+
+{% from 'default/_helpers.jinja' import render_field %}
+
+
+{% block extra_head %}
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(function(){
+  // Register on change event
+
+  // On change of shipping address country
+  $("select#new_shipping_address-country").change(function(){
+    $.getJSON("{{ url_for('nereid.website.subdivision_list') }}",
+      {country: $(this).val()}, function(data){
+      var options = '';
+      $.each(data.result, function(index, map){
+          options += '<option value="' + map.id + '" code="' + map.code + '">' + map.name + '</option>';
+      });
+      $("select#new_shipping_address-subdivision").html(options);
+      $("select#new_shipping_address-subdivision option[value='{{ form.new_shipping_address.form.subdivision.data }}']").attr('selected', true);
+    });
+  });
+
+
+  // On change of billing address country
+  $("select#new_billing_address-country").change(function(){
+    $.getJSON("{{ url_for('nereid.website.subdivision_list') }}",
+      {country: $(this).val()}, function(data){
+      var options = '';
+      $.each(data.result, function(index, map){
+          options += '<option value="' + map.id + '" code="' + map.code + '">' + map.name + '</option>';
+      });
+      $("select#new_billing_address-subdivision").html(options);
+      $("select#new_billing_address-subdivision option[value='{{ form.new_billing_address.form.subdivision.data }}']").attr('selected', true);
+    });
+  });
+
+ // Onload trigger the change as country comes packed with form
+  $("select#new_billing_address-country").triggerHandler("change");
+  $("select#new_shipping_address-country").triggerHandler("change");
+
+  // Use client side validation on the form
+  $("form#checkout").validate({
+    errorElement: "span",
+    wrapper: "",
+    errorPlacement: function(error, element) {
+      error.insertAfter(element);
+      console.log(error);
+      console.log(element);
+      element.parents("div.clearfix").addClass("error");
+    },
+    submitHandler: function(form) {
+      //$("form#edit-address button.cont").button('loading');
+      form.submit();
+    }
+  });
+
+  {% for field, errors in form.errors.iteritems() %}
+    {% for error in errors %}
+      $.meow({
+        message: '{{ field.upper() }}: {{ error }}',
+      }); 
+    {% endfor %}
+  {% endfor %}
+
+});
+</script>
+{% endblock %}
+
+
+{% block main %}
+<div class="container_16 padding50">
+  <div class="grid_16">
+    <div class="ribbonbig">
+      <div class="lijevo">
+        <div class="bread"><a href="#">Home</a>&nbsp;&nbsp;&gt;&nbsp;Checkout</div>
+        <div class="bigtitle">{% trans %}Checkout{% endtrans %}</div>
+      </div>
+      <div class="desno">&nbsp;</div>
+    </div>
+  </div>
+  <form id="checkout" class="classic" method="post" action="{{ url_for('nereid.checkout.default.checkout') }}">
+  <div class="grid_8">
+    <div class="padding25">
+
+      {% if request.is_guest_user %}
+      <div class="shiztitle">
+        <h2 class="title h2bg">New Customer</h2>
+      </div>
+      <span>Checkout Options</span>
+      <div class="checkoptions">
+          <input type="radio" name="registeracc" value="Register" checked="">
+          Register Account<br>
+          <input type="radio" name="guestacc" value="Guest">
+          Guest Checkout
+      </div>
+      <span class="registerdetails">By creating an account you will be able to shop faster, be up to date
+      on an order's status, and keep track of the orders you have made.</span> <a href="#" class="mailsubmit">Continue</a>
+      {% endif %}
+
+      <div class="billing">
+        <div class="shiztitle">
+          <h2 class="title h2bg">{% trans %}Billing Address{% endtrans %}</h2>
+        </div>
+          {% if not request.is_guest_user %}
+          {{ render_field(form.billing_address, class_="half") }}
+          {% endif %}
+          {{ render_field(form.new_billing_address.form.name, class_="half shorty billing-address") }}
+          {{ render_field(form.new_billing_address.form.street, class_="half shorty billing-address") }}
+          {{ render_field(form.new_billing_address.form.streetbis, class_="half shorty billing-address") }}
+          {{ render_field(form.new_billing_address.form.city, class_="half shorty billing-address") }}
+          {{ render_field(form.new_billing_address.form.zip, class_="half shorty billing-address") }}
+          {{ render_field(form.new_billing_address.form.email, class_="half shorty billing-address email") }}
+          {{ render_field(form.new_billing_address.form.phone, class_="half shorty billing-address") }}
+
+
+          <div class="clearfix ">
+            <label for="new_billing_address-country">Country *:</label>
+            <div class="input">
+              <select class="half shorty billing-address required" id="new_billing_address-country" name="new_billing_address-country" type="text">
+                {% for country in request.nereid_website.countries %}
+                <option value="{{ country.id }}">{{ country.name }}</option>
+                {% endfor %}
+              </select>
+              {% for error in form.new_billing_address.form.country.errors %}
+              <br/><span class="help-inline">{{ error|string }}</span>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="clearfix ">
+            <label for="new_billing_address-subdivision">Subdivision *:</label>
+            <div class="input">
+              <select class="half shorty billing-address required" id="new_billing_address-subdivision" name="new_billing_address-subdivision" type="text">
+              </select>
+            </div>
+            {% for error in form.new_billing_address.form.subdivision.errors %}
+            <br/><span class="help-inline">{{ error|string }}</span>
+            {% endfor %}
+          </div>
+
+      </div>
+    </div>
+  </div>
+  <div class="grid_8">
+    <div class="padding25">
+      {% if request.is_guest_user %}
+      <div class="shiztitle">
+        <h2 class="title h2bg">Already Customer</h2>
+      </div>
+      <span>I am returning customer</span>
+        <input type="text" class="half shorty" value="Username" onfocus="if(this.value=='Username')this.value='';" onblur="if(this.value=='')this.value='Username';">
+        <input type="text" class="half shorty" value="Password" onfocus="if(this.value=='Password')this.value='';" onblur="if(this.value=='')this.value='Password';">
+        <input type="submit" value="Login" class="mailsubmit left2">
+
+      {% endif %}
+      <div class="billing">
+        <div class="shiztitle">
+          <h2 class="title h2bg">Shipping Address</h2>
+        </div>
+          {% if not request.is_guest_user %}
+          {{ render_field(form.shipping_address, class_="half") }}
+          {% endif %}
+          {{ render_field(form.new_shipping_address.form.name, class_="half shorty shipping-address") }}
+          {{ render_field(form.new_shipping_address.form.street, class_="half shorty shipping-address") }}
+          {{ render_field(form.new_shipping_address.form.streetbis, class_="half shorty shipping-address") }}
+          {{ render_field(form.new_shipping_address.form.city, class_="half shorty shipping-address") }}
+          {{ render_field(form.new_shipping_address.form.zip, class_="half shorty shipping-address") }}
+          {{ render_field(form.new_shipping_address.form.email, class_="half shorty shipping-address email") }}
+          {{ render_field(form.new_shipping_address.form.phone, class_="half shorty shipping-address") }}
+
+
+          <div class="clearfix ">
+            <label for="new_shipping_address-country">Country *:</label>
+            <div class="input">
+              <select class="half shorty shipping-address required" id="new_shipping_address-country" name="new_shipping_address-country" type="text">
+                {% for country in request.nereid_website.countries %}
+                <option value="{{ country.id }}">{{ country.name }}</option>
+                {% endfor %}
+              </select>
+              {% for error in form.new_shipping_address.form.country.errors %}
+              <br/><span class="help-inline">{{ error|string }}</span>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="clearfix ">
+            <label for="new_shipping_address-subdivision">Subdivision *:</label>
+            <div class="input">
+              <select class="half shorty shipping-address required" id="new_shipping_address-subdivision" name="new_shipping_address-subdivision" type="text">
+              </select>
+              {% for error in form.new_shipping_address.form.subdivision.errors %}
+              <br/><span class="help-inline">{{ error|string }}</span>
+              {% endfor %}
+            </div>
+          </div>
+
+      </div>
+    </div>
+  </div>
+  <!--<div class="grid_16">
+    <div class="padding25">
+      <div class="shiztitle">
+        <h2 class="title h2bg">Order Comments</h2>
+      </div>
+      <span>Notes about order, for example instructions for delivery.</span>
+      <textarea class="bigewizz"></textarea>
+      <div class="std">
+        <input type="checkbox" value="Bike" name="vehicle" class="checkbox">
+        I have read and agree to the <a href="#">Terms and conditions</a> </div>
+    </div>
+  </div>-->
+  <div class="grid_16">
+    <div class="padding25">
+      <div class="shiztitle">
+        <h2 class="title h2bg">Payment Method</h2>
+      </div>
+      <div class="method">
+        {% for method in request.nereid_website.allowed_gateways %}
+        <input type="radio" value="{{ method.id }}" name="payment_method">
+        {{ method.name }}<br>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  <div class="grid_16">
+    <div class="padding25">
+      <div class="shiztitle">
+        <h2 class="title h2bg">Confirm Order</h2>
+      </div>
+      <div class="content">
+        <table cellpadding="3" cellspacing="3">
+          <tbody><tr class="blacky">
+            <td class="table210">Name</td>
+            <td class="table100">Item No.</td>
+            <td class="table100">Quantity</td>
+            <td class="table95">Unit Price</td>
+            <td class="table100">Total Price</td>
+          </tr>
+          {% for line in cart.sale.lines %}
+          <tr>
+            <td>{{ line.product.name }}</td>
+            <td>{{ line.product.code }}</td>
+            <td>{{ line.quantity|int }} {{ line.unit.name }}</td>
+            <td>{{ line.unit_price|currencyformat(line.sale.currency.code) }}</td>
+            <td>{{ line.amount|currencyformat(line.sale.currency.code) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody></table>
+      </div>
+    </div>
+  </div>
+  <div class="grid_7 notempty"></div>
+  <div class="grid_9"> 
+    <span class="subtotal">Sub Total:&nbsp;&nbsp;&nbsp;{{ cart.sale.untaxed_amount|currencyformat(cart.sale.currency.code) }}</span> 
+    <span class="subtotal">Tax :&nbsp;&nbsp;&nbsp;&nbsp;{{ cart.sale.tax_amount|currencyformat(cart.sale.currency.code) }}</span>
+    <div class="total">Total : <span class="bigprice">{{ cart.sale.total_amount|currencyformat(cart.sale.currency.code) }}</span></div>
+    <div class="updaters">
+      <input type="submit" name="updater" id="updater" value="Order Now" class="mailsubmit">
+    </div>
+  </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block belowmain %}{% endblock %}

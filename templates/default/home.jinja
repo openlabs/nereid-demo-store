@@ -1,0 +1,64 @@
+{% extends 'default/base.jinja' %}
+
+{% set title = "Home" %}
+
+
+{% block main %}
+<script>
+  $(document).ready(function() {
+    $('a.padd').click(function() {
+      $.post(
+        '{{ url_for('nereid.cart.add_to_cart') }}',
+        {
+          product: $(this).attr('data-product'),
+          quantity: 1
+        },
+        function() {
+          window.url = '{{ url_for('nereid.cart.view_cart') }}';
+        }
+      );
+    });
+  });
+</script>
+<div class="container_16">
+  <div class="grid_16">
+    {% if request.nereid_website.latest_products_node %}
+    <div class="sliderinner"> <a href="javascript:;" class="slideprev">Previous</a> <a href="javascript:;" class="slidenext">Next</a>
+      <ul>
+        {% for product in request.nereid_website.latest_products_node.products[:5] %}
+        <li>
+          <div class="leftpart">
+            <a href="{{ url_for('product.product.render', uri=product.uri) }}">
+              <img src="{{ product.image_sets[0].large_image.url }}" alt="{{ product.name }}" /> 
+            </a>
+          </div>
+          <div class="rightpart">
+            <div class="discount">
+              {% set sale_price = product.sale_price(product.id, 1) %}
+              {% if sale_price < product.list_price %}
+              <span class="old">{{ product.list_price|currencyformat(request.nereid_currency.code) }}</span> 
+              {% endif %}
+              <span class="new">{{ sale_price|currencyformat(request.nereid_currency.code) }}</span> 
+            </div>
+            <h1>{{ product.name }}</h1>
+            <div class="pdesc">{{ product.description|truncate(250) }}</div>
+            <a class="padd" data-product="{{ product.id }}" href="#">Add to cart</a> </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="sliderout">
+      <ul class="ftrd">
+        <div class="thingy"> <img src="{{ STATIC }}images/slidething.png" class="handle" alt="" /> </div>
+        {% for product in request.nereid_website.latest_products_node.products[:5] %}
+        <li class="ftrd-lbl{{ loop.index }}">
+          <h2>{{ product.name|truncate(50) }}</h2>
+          <span>{{ product.description|truncate(100) }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
