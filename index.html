@@ -1,0 +1,121 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Nereid-demo-store by openlabs</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Nereid-demo-store</h1>
+        <p>Demo store for nereid</p>
+        <p class="view"><a href="https://github.com/openlabs/nereid-demo-store">View the Project on GitHub <small>openlabs/nereid-demo-store</small></a></p>
+        <ul>
+          <li><a href="https://github.com/openlabs/nereid-demo-store/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/openlabs/nereid-demo-store/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/openlabs/nereid-demo-store">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>Welcome to Nereid.</h1>
+
+<p>Nereid is a web framework built over Flask, with Tryton as a Backend. To know more about Nereid, you could read the <a href="http://nereid.openlabs.co.in/docs/">documentation</a>.</p>
+
+<h2>The demo store</h2>
+
+<p>The demo store is an fictional e-commerce store, hosted at <a href="http://nereid-demo.openlabs.co.in">nereid-demo.openlabs.co.in</a>. The store is powered by <a href="http://nereid.openlabs.co.in/docs/">nereid</a> and the following tryton modules which provides the e-commerce functionality. The data in the store is a subset of the <a href="http://www.icecat.biz/">ICECAT Open Catalogue</a> and the images are loaded from Icecat too (which is terribly slow at times). Before you ask, the price in the store is a random value between 0 and 1000 and has no relation whatsoever to real prices (That is not a problem since we dont ship what you buy).</p>
+
+<ul>
+<li>Server: nereid-demo.openlabs.co.in</li>
+<li>Trytond: runs on same server on port 8000</li>
+<li>Store URL: <a href="http://nereid-demo.openlabs.co.in">http://nereid-demo.openlabs.co.in</a>
+</li>
+<li>Database name: nereid</li>
+<li>Login Credentials: admin/admin</li>
+</ul><p>The demo is hosted on an <a href="http://aws.amazon.com/ec2/instance-types/">Amazon (AWS) Micro instance</a> with 613 MB of memory and runs trytond, postgres 9.0 and nereid over nginx.</p>
+
+<h3>Nereid Catalog</h3>
+
+<p>Allows displaying of products and depends on the tryton product module. It also introduces a concept of Browse Nodes which allows you to attach products to multiple hierarchical classifications.</p>
+
+<p>Source Code: <a href="https://github.com/openlabs/nereid-catalog">Nereid Catalog on Github</a></p>
+
+<h3>Nereid Cart (B2C)</h3>
+
+<p>Contributes to the shopping cart experience.</p>
+
+<p>Source Code: <a href="https://github.com/openlabs/nereid-cart-b2c">Nereid Cart (B2C) on Github</a></p>
+
+<h3>Nereid Checkout</h3>
+
+<p>Module implements the checkout functionality and includes a standard one page checkout functionality.</p>
+
+<p>Source Code: <a href="https://github.com/openlabs/nereid-checkout">Nereid Checkout on Github</a></p>
+
+<h3>Nereid Payment</h3>
+
+<p>This module builds the basic architecture on which all other payment gateways could be based. By default this offers COD (Cash on Delivery) and Cheque payments as options.</p>
+
+<p>Source Code: <a href="https://github.com/openlabs/nereid-payment">Nereid Payment on Github</a></p>
+
+<h3>Nereid Facebook Authentication</h3>
+
+<p>Provides facebook based authentication in addition to the conventional login.</p>
+
+<p>Source Code: <a href="https://github.com/openlabs/nereid-auth-facebook">Nereid Facebook Auth on Github</a></p>
+
+<h3>Demo store module and templates</h3>
+
+<p>Has the template for the store and some quick hacks we used to build this site.</p>
+
+<p>Source Code: <a href="https://github.com/openlabs/nereid-demo-store">Nereid Demo Store on Github</a></p>
+
+<h2>A walkthrough</h2>
+
+<p>So you might be wondering how do I test this store ? Well, below are some quick tasks which will get you used to the system. Remember that we rest the system every 2 hours, so none of your data will be saved when that happens!</p>
+
+<p>Note: The store is based on Tryton 2.4 version. So you need a version 2.4 <a href="http://www.tryton.org/downloads.html">Tryton Client</a>. Familiarity with Tryton is assumed in the following examples. However, if you are not familiar with Tryton, feel free to contact our team at <a href="mailto:sales@openlabs.co.in">sales@openlabs.co.in</a> or catch one of us on the Tryton IRC (on freenode).</p>
+
+<h3>Tip 1: Modifying the product information</h3>
+
+<p>Identify a product and try changing its name, simple description and other information. You might even want to test the multi-language feature by changing the name of the product in different languages.</p>
+
+<h3>Tip 2: Availability of product</h3>
+
+<p>The product availability is computed every time and only a handful of products, mostly the ones in the homepage are available. You could test the behavior by creating a new purchase or by Inventory adjustments.</p>
+
+<h3>Tip 3: Complete a checkout</h3>
+
+<p>Complete a checkout process and see the same as a new order in your confirmed sales. If you used paypal gateway you can even see your confirmed invoice since the order was prepaid.</p>
+
+<h2>Have more questions ?</h2>
+
+<p>Feel free to mail us at <a href="mailto:sales@openlabs.co.in">sales@openlabs.co.in</a>, or if you live near us - feel free to drop in for a cup of coffee (or a Beer!). Are you a tweeter ? Tweet at us @openlabsindia or use the hash tag #nereid and we will find you.</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/openlabs">openlabs</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-12853548-3");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
