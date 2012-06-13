@@ -9,3 +9,4 @@
 """
 import product
 import checkout
+import user
