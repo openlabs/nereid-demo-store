@@ -39,7 +39,6 @@
       {% for category, message in get_flashed_messages(with_categories=True) %}
       $.meow({
         message: '{{ message }}',
-        icon: '{{ category or '' }}'
       });
       {% endfor %}
     });

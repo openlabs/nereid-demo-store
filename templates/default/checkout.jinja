@@ -7,6 +7,26 @@
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function(){
   // Register on change event
+  $("select#billing_address").change(function() {
+    if ($(this).val() == '0') {
+      $("div#billing-address-fields").show();
+      $("input.billing-address.not-required-now").removeClass('not-required-now').addClass('required');
+    } else {
+      $("div#billing-address-fields").hide();
+      $("input.billing-address.required").removeClass('required').addClass('not-required-now');
+    }
+  });
+
+  $("select#shipping_address").change(function() {
+    if ($(this).val() == '0') {
+      $("div#shipping-address-fields").show();
+      $("input.shipping-address.not-required-now").removeClass('not-required-now').addClass('required');
+    } else {
+      $("div#shipping-address-fields").hide();
+      $("input.shipping-address.required").removeClass('required').addClass('not-required-now');
+    }
+  });
+
 
   // On change of shipping address country
   $("select#new_shipping_address-country").change(function(){
@@ -36,6 +56,8 @@
   });
 
  // Onload trigger the change as country comes packed with form
+  $("select#billing_address").triggerHandler("change");
+  $("select#shipping_address").triggerHandler("change");
   $("select#new_billing_address-country").triggerHandler("change");
   $("select#new_shipping_address-country").triggerHandler("change");
 
@@ -105,6 +127,7 @@
           {% if not request.is_guest_user %}
           {{ render_field(form.billing_address, class_="half") }}
           {% endif %}
+          <div id="billing-address-fields">
           {{ render_field(form.new_billing_address.form.name, class_="half shorty billing-address") }}
           {{ render_field(form.new_billing_address.form.street, class_="half shorty billing-address") }}
           {{ render_field(form.new_billing_address.form.streetbis, class_="half shorty billing-address") }}
@@ -138,7 +161,7 @@
             <br/><span class="help-inline">{{ error|string }}</span>
             {% endfor %}
           </div>
-
+          </div>
       </div>
     </div>
   </div>
@@ -161,6 +184,7 @@
           {% if not request.is_guest_user %}
           {{ render_field(form.shipping_address, class_="half") }}
           {% endif %}
+          <div id="shipping-address-fields">
           {{ render_field(form.new_shipping_address.form.name, class_="half shorty shipping-address") }}
           {{ render_field(form.new_shipping_address.form.street, class_="half shorty shipping-address") }}
           {{ render_field(form.new_shipping_address.form.streetbis, class_="half shorty shipping-address") }}
@@ -194,7 +218,7 @@
               {% endfor %}
             </div>
           </div>
-
+         </div>
       </div>
     </div>
   </div>
@@ -220,6 +244,9 @@
         <input type="radio" value="{{ method.id }}" name="payment_method">
         {{ method.name }}<br>
         {% endfor %}
+      </div>
+      <div>
+      If you are using paypal/credit card to pay, use these credentials:nereid_1339579086_per@openlabs.co.in/339579214.
       </div>
     </div>
   </div>

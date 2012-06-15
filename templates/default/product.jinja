@@ -90,11 +90,16 @@
       <div class="sharing">
         <div class="addthis_toolbox addthis_default_style "> <a class="addthis_counter addthis_pill_style"></a> <div class="atclear"></div></div>
         <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=xa-4f0d0827271d1c3b"></script>
-        {% if product.get_availability(product.id)['quantity'] %}
-        <span class="instock">{% trans %}In stock{% endtrans %}</span></div>
+        {% set availability = product.get_availability(product.id) %}
+        {% if availability['quantity'] %}
+        <span class="instock">
+          {% if availability['quantity'] < 10 %}{% trans %}Only{% endtrans %} {{ availability['quantity']|int }}{{ product.sale_uom.symbol }} {% endif %}
+          {% trans %}In stock{% endtrans %}
+        </span>
         {% else %}
-        <span class="nostock">{% trans %}Out of stock{% endtrans %}</span></div>
+        <span class="nostock">{% trans %}Out of stock{% endtrans %}{% if availability['forecast_quantity'] %}{% trans %}More coming soon{% endtrans %}{% endif %}</span>
         {% endif %}
+        </div>
 
     </div>
     <div class="tabs">
