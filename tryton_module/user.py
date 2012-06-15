@@ -13,6 +13,7 @@ class User(ModelSQL, ModelView):
     _name = "res.user"
 
     def __init__(self):
+        super(User, self).__init__()
         self._error_messages.update({
             'cannot_create': 'For security reasons creating users is disabled',
             'security_check': 'For security reasons this op is not allowed'
