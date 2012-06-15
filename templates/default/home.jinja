@@ -53,7 +53,7 @@
         {% for product in request.nereid_website.latest_products_node.products[:5] %}
         <li class="ftrd-lbl{{ loop.index }}">
           <h2>{{ product.name|truncate(50) }}</h2>
-          <span>{{ product.description|truncate(100) }}</span>
+          <span>{{ product.code }}</span>
         </li>
         {% endfor %}
       </ul>
